@@ -249,21 +249,29 @@ vec3 doColor(vec3 p) {
     return res;
 }
 
+void PH(float tmpTime, float phaseTime, int phaseNumber, int n, int v) {
+    if (tmpTime >= 0.0) {
+        phaseTime = tmpTime; 
+        phaseNumber = n;
+    }  
+    
+    tmpTime -= float(v);
+}
+
 void mainImage(out vec4 fragColor, vec2 fragCoord) {
     vec2 p = (fragCoord.xy * 2.0 - iResolution.xy) / iResolution.y;
     vec3 ro = vec3(0, 5, 8), rd = normalize(vec3(p, 2)), 
          ta = vec3(0, 5, 0);
     
     // camera sequence 
-	float phaseTime, tmpTime = mod(iTime, 30.0);
-  	int phaseNumber; 	
-  	#define PH(n,v) if (tmpTime >= 0.0) {phaseTime = tmpTime; phaseNumber = n;}  tmpTime -= float(v);  
+	float phaseTime = 0.0, tmpTime = mod(iTime, 30.0);
+  	int phaseNumber = 0; 	
     
-    PH(0, 7)
-    PH(1, 5)
-    PH(2, 5)
-    PH(3, 3)
-        
+    int[4] es = int[](7, 5, 5, 3);
+    
+    for (int i = 0; i < 4; i++) PH(tmpTime, phaseTime, phaseNumber, i, 
+        es[i]);
+    
     switch (phaseNumber) {
     	case 0:
         	ro.xz *= rotate(iTime / 10.0);
@@ -280,7 +288,7 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
     		break;
     	
         case 3: 
-   			ta.x =5.0 - phaseTime * 1.5;
+   			ta.x = 5.0 - phaseTime * 1.5;
         	ro.z -= phaseTime / 5.0 - 1.0;
      		ro.xz *= rotate(0.5);
   		 	break;
@@ -291,12 +299,10 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
 	vec3 col =vec3(0.05, 0.1, 0.3)- vec3(p.y * p.y) / 2.0;
     col = mix(col, texture(iChannel3, p / 10.0 - iTime / 200.0).xyz, 
         0.3);
-    
-    
-	const float maxd = 100.0, precis = 1e-3;
-	float t = 0.0, d = 0.0;
+      
+	float maxd = 100.0, precis = 1e-3, t = 0.0, d = 0.0;
  	
-    for (int i = 0; i < 128; i++) {
+    for (int i = 0; i < 128; i++) { //la cond no vale aqui
 		vec3 p = rd * t + ro;
     	t += d = map(p);
     	
@@ -306,15 +312,12 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
   	if (d < precis) {
 	  	vec3 p = rd * t + ro, nor = calcNormal(p), 
             li = normalize(vec3(1)), bg = col;
-        col = doColor(p);
         float dif = clamp(dot(nor, li), 0.3, 1.0), 
-            amb = max(0.5 + 0.5 * nor.y, 0.0), 
+            amb = max((nor.y + 1.0) / 2.0, 0.0), 
             spc = pow(clamp(dot(reflect(normalize(p - ro), nor), li), 
                 0.0, 1.0), 30.0);
-        col *= dif * amb ;
-        col += spc;
-        col = clamp(col, 0.0, 1.0);
-        col = pow(col, vec3(0.7));        
+        col = pow(clamp(doColor(p) * dif * amb + spc, 0.0, 1.0), 
+            vec3(0.7));        
     }
     
     fragColor = vec4(col, 1.0);
