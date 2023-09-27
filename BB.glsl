@@ -1,28 +1,11 @@
-
-#define idxCenter         0
-#define idxUpperBody      1
-#define idxNeck           2
-#define idxHead           3
-#define idxRightShoulder  4
-#define idxRightUpperArm  5
-#define idxRightLowerArm  6
-#define idxRightHand      7
-#define idxLeftShoulder   8
-#define idxLeftUpperArm   9
-#define idxLeftLowerArm  10
-#define idxLeftHand      11
-#define idxLowerBody     12
-#define idxRightHip      13
-#define idxRightUpperLeg 14
-#define idxRightLowerLeg 15
-#define idxRightFoot     16
-#define idxLeftHip       17
-#define idxLeftUpperLeg  18
-#define idxLeftLowerLeg  19
-#define idxLeftFoot      20
-#define idxModelPos      21
-#define idxNone         256
-
+const int idxCenter = 0, idxUpperBody = 1, idxNeck = 2, idxHead = 3,           
+          idxRightShoulder = 4, idxRightUpperArm = 5, 
+          idxRightLowerArm = 6, idxRightHand = 7, idxLeftShoulder = 8,
+          idxLeftUpperArm = 9, idxLeftLowerArm = 10, idxLeftHand = 11,
+          idxLowerBody = 12, idxRightHip = 13, idxRightUpperLeg = 14,
+          idxRightLowerLeg = 15, idxRightFoot = 16, idxLeftHip = 17,
+          idxLeftUpperLeg = 18, idxLeftLowerLeg = 19, idxLeftFoot = 20,
+          idxModelPos = 21, idxNone = 256;
 
 int parentIdx[22] = int[](
 	idxNone,          // idxCenter
