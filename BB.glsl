@@ -7,30 +7,23 @@ const int idxCenter = 0, idxUpperBody = 1, idxNeck = 2, idxHead = 3,
           idxLeftUpperLeg = 18, idxLeftLowerLeg = 19, idxLeftFoot = 20,
           idxModelPos = 21, idxNone = 256;
 
-int parentIdx[22] = int[](
-	idxNone,          // idxCenter
-	idxCenter,        // idxUpperBody
-	idxUpperBody,     // idxNeck
-	idxNeck,          // idxHead
-	idxUpperBody,     // idxRightShoulder
-	idxRightShoulder, // idxRightUpperArm
-	idxRightUpperArm, // idxRigthLowerArm
-	idxRightLowerArm, // idxRithHand
-	idxUpperBody,     // idxLeftShoulder
-	idxLeftShoulder,  // idxLeftUpperArm
-	idxLeftUpperArm,  // idxLeftLowerArm
-	idxLeftLowerArm,  // idxLeftHand
-	idxCenter,        // idxLowerBody
-	idxLowerBody,     // idxRightHip
-	idxRightHip,      // idxRightUpperLeg
-	idxRightUpperLeg, // idxRightLowerLeg
-	idxRightLowerLeg, // idxRightFoot
-	idxLowerBody,     // idxLeftHip
-	idxLeftHip,       // idxLeftUpperLeg
-	idxLeftUpperLeg,  // idxLeftLowerLeg
-	idxLeftLowerLeg,  // idxLeftFoot
-	idxNone           // idxNone
-);
+int parentIdx[22] = int[](idxNone, idxCenter, idxUpperBody,      
+                          idxNeck, idxUpperBody, idxRightShoulder,  
+                          idxRightUpperArm, idxRightLowerArm, 
+                          idxUpperBody, idxLeftShoulder,   
+                          idxLeftUpperArm, idxLeftLowerArm,   
+                          idxCenter, idxLowerBody, idxRightHip,       
+                          idxRightUpperLeg, idxRightLowerLeg, 
+                          idxLowerBody, idxLeftHip, idxLeftUpperLeg,  
+                          idxLeftLowerLeg, idxNone);
+
+/*idxCenter, idxUpperBody, idxNeck, idxHead
+  idxRightShoulder, idxRightUpperArm, idxRigthLowerArm
+  idxRithHand, idxLeftShoulder, idxLeftUpperArm
+  idxLeftLowerArm, idxLeftHand, idxLowerBody
+  idxRightHip, idxRightUpperLeg, idxRightLowerLeg
+  idxRightFoot, idxLeftHip, idxLeftUpperLeg
+  idxLeftLowerLeg, idxLeftFoot, idxNone*/
 
 #define tailCenter        vec3(0,0,0)
 
