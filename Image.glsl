@@ -183,78 +183,79 @@ float deHand(vec3 p, int LR) {
 }
 
 float deUpperLeg(vec3 p, int LR) {
-    int idx = (LR==R)?idxRightUpperLeg:idxLeftUpperLeg;
+    int idx = (LR == R) ? idxRightUpperLeg : idxLeftUpperLeg;
     p = transform(p, idx);
     vec2 de = deCapsule(p, vec3(0), pos[idx]);
-    return de.x - smoothstep(1.6,0.6,de.y)*0.3;
-}
-
-float deLowerLeg(vec3 p, int LR)
-{
-    int idx = (LR==R)?idxRightLowerLeg:idxLeftLowerLeg;
-    p = transform(p, idx);
-    vec2 de = deCapsule(p, vec3(0), pos[idx]);
-    return de.x - smoothstep(1.6,0.6,de.y)*0.2;
-}
-float deFoot(vec3 p, int LR)
-{
-    int idx = (LR==R)?idxRightFoot:idxLeftFoot;
-    p = transform(p, idx);
-    p-=pos[idx]*0.45;
-    vec2 c = vec2(p.z, length(p.xy*vec2(1,1.3))); 
-   	c.x = (c.x>0.)?pow(c.x,1.5):c.x/2.0;
-    return length(c)-0.2;
-}
-
-float map(vec3 p)
-{
-    float len=length(p-modelPos()), r = 5.;
-    if (len>r) return len -r+ 0.001;   
     
-    float de = 1.0;
-    de = min(de, deUpperBody(p));
-    de = smin(de, deNeck(p),0.1);
-    de = smin(de, deHead(p),0.1);
-    de = smin(de, deLowerBody(p),0.3);
-    de = smin(de, deUpperArm(p, L),0.4);
-    de = smin(de, deUpperArm(p, R),0.4);
-    de = smin(de, deLowerArm(p, L),0.03);
-    de = smin(de, deLowerArm(p, R),0.03);
-    de = smin(de, deHand(p, L),0.1);
-    de = smin(de, deHand(p, R),0.1);    
-    de = smin(de, deUpperLeg(p, L),0.1);
-    de = smin(de, deUpperLeg(p, R),0.1);
-    de = smin(de, deLowerLeg(p, L),0.05);
-    de = smin(de, deLowerLeg(p, R),0.05);
-    de = smin(de, deFoot(p, L),0.1);
-    de = smin(de, deFoot(p, R),0.1);
+    return de.x - smoothstep(1.6, 0.6, de.y) * 0.3;
+}
+
+float deLowerLeg(vec3 p, int LR) {
+    int idx = (LR == R) ? idxRightLowerLeg : idxLeftLowerLeg;
+    p = transform(p, idx);
+    vec2 de = deCapsule(p, vec3(0), pos[idx]);
+    
+    return de.x - smoothstep(1.6, 0.6, de.y) / 5.0;
+}
+
+float deFoot(vec3 p, int LR) {
+    int idx = (LR == R) ? idxRightFoot : idxLeftFoot;
+    p = transform(p, idx);
+    p -= pos[idx] * 0.45;
+    vec2 c = vec2(p.z, length(p.xy * vec2(1, 1.3))); 
+   	c.x = (c.x > 0.0) ? pow(c.x, 1.5) : c.x / 2.0;
+    
+    return length(c) - 0.2;
+}
+
+float map(vec3 p) {
+    float len = length(p - modelPos()), r = 5.0, de = len - r + 1e-3;
+        
+    if (len<=r) { 
+        de = min(1.0, deUpperBody(p));
+        de = smin(de, deNeck(p), 0.1);
+        de = smin(de, deHead(p), 0.1);
+        de = smin(de, deLowerBody(p), 0.3);
+        de = smin(de, deUpperArm(p, L), 0.4);
+        de = smin(de, deUpperArm(p, R), 0.4);
+        de = smin(de, deLowerArm(p, L), 0.03);
+        de = smin(de, deLowerArm(p, R), 0.03);
+        de = smin(de, deHand(p, L), 0.1);
+        de = smin(de, deHand(p, R), 0.1);    
+        de = smin(de, deUpperLeg(p, L), 0.1);
+        de = smin(de, deUpperLeg(p, R), 0.1);
+        de = smin(de, deLowerLeg(p, L), 0.05);
+        de = smin(de, deLowerLeg(p, R), 0.05);
+        de = smin(de, deFoot(p, L), 0.1);
+        de = smin(de, deFoot(p, R), 0.1);
+    }
+    
     return de;
 }
 
 vec3 calcNormal(vec3 pos){
-  vec2 e = vec2(1, -1) * 0.002;
-  return normalize(
-    e.xyy*map(pos+e.xyy)+e.yyx*map(pos+e.yyx)+ 
-    e.yxy*map(pos+e.yxy)+e.xxx*map(pos+e.xxx)
-  );
+  vec2 e = vec2(1, -1) / 2e3;
+  
+  return normalize(e.xyy * map(pos + e.xyy) + e.yyx * map(pos + e.yyx) + 
+                   e.yxy * map(pos + e.yxy) + e.xxx * map(pos + e.xxx));
 }
     
-vec3 doColor(vec3 p)
-{
-	const float precis = 0.001;
- 	if(deLowerLeg(p,L)<precis) return vec3(1,0.2,0);
- 	return vec3(0.5,0.9,0.5);
+vec3 doColor(vec3 p) {
+	float precis = 1e-3;   
+    vec3 res = vec3(0.5, 0.9, 0.5);
+ 	
+    if (deLowerLeg(p, L) < precis) res = vec3(1, 0.2, 0);
+ 	
+    return res;
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
+void mainImage(out vec4 fragColor, vec2 fragCoord) {
     vec2 p = (fragCoord.xy * 2.0 - iResolution.xy) / iResolution.y;
-    vec3 ro = vec3(0,5,8);
-    vec3 rd = normalize(vec3(p, 2));
-    vec3 ta = vec3(0,5,0);
+    vec3 ro = vec3(0, 5, 8), rd = normalize(vec3(p, 2)), 
+         ta = vec3(0, 5, 0);
     
     // camera sequence 
-	float phaseTime, tmpTime = mod(iTime,30.0);
+	float phaseTime, tmpTime = mod(iTime, 30.0);
   	int phaseNumber; 	
   	#define PH(n,v) if (tmpTime >= 0.0) {phaseTime = tmpTime; phaseNumber = n;}  tmpTime -= float(v);  
     
@@ -265,51 +266,56 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         
     switch (phaseNumber) {
     	case 0:
-        	ro.xz *= rotate(iTime*0.1);
+        	ro.xz *= rotate(iTime / 10.0);
    			break;
-    	case 1:
-        	ta.x +=3.;
-   			ro.z += -phaseTime * 4.0;
+    	
+        case 1:
+        	ta.x += 3.0;
+   			ro.z += phaseTime * -4.0;
     		break;
-    	case 2:
-   			ta.y =6.0-phaseTime *0.5;
-        	ro.z -=2.0;
-    		 break;
-    	case 3: 
-   			ta.x =5.0-phaseTime *1.5;
-        	ro.z -=-1.0+phaseTime * 0.2;
+    	
+        case 2:
+   			ta.y = 6.0 - phaseTime / 2.0;
+        	ro.z -= 2.0;
+    		break;
+    	
+        case 3: 
+   			ta.x =5.0 - phaseTime * 1.5;
+        	ro.z -= phaseTime / 5.0 - 1.0;
      		ro.xz *= rotate(0.5);
   		 	break;
     }    
 
-	rd = lookat(ta-ro) * rd;
+	rd = lookat(ta - ro) * rd;
     
-	vec3 col =vec3(0.05,0.1,0.3)- vec3(p.y*p.y)*0.5;
-    col = mix(col, texture(iChannel3, p * 0.1 - iTime * 0.005).xyz, 0.3);
+	vec3 col =vec3(0.05, 0.1, 0.3)- vec3(p.y * p.y) / 2.0;
+    col = mix(col, texture(iChannel3, p / 10.0 - iTime / 200.0).xyz, 
+        0.3);
     
     
-	const float maxd = 100.0, precis = 0.001;
-	float t = 0.0, d;
- 	for(int i = 0; i < 128; i++)
-  	{
-		vec3 p=ro + rd * t;
-    	t += d =map(p);
-    	if(d < precis || t > maxd) break;
+	const float maxd = 100.0, precis = 1e-3;
+	float t = 0.0, d = 0.0;
+ 	
+    for (int i = 0; i < 128; i++) {
+		vec3 p = rd * t + ro;
+    	t += d = map(p);
+    	
+        if(d < precis || t > maxd) i = 128; 
   	}
-  	if(d < precis)
-  	{
-	  	vec3 p = ro + rd * t;
-	 	vec3 nor = calcNormal(p);
-    	vec3 li = normalize(vec3(1));
-        vec3 bg = col;
+    
+  	if (d < precis) {
+	  	vec3 p = rd * t + ro, nor = calcNormal(p), 
+            li = normalize(vec3(1)), bg = col;
         col = doColor(p);
-        float dif = clamp(dot(nor, li), 0.3, 1.0);
-        float amb = max(0.5 + 0.5 * nor.y, 0.0);
-        float spc = pow(clamp(dot(reflect(normalize(p - ro), nor), li), 0.0, 1.0), 30.0);
+        float dif = clamp(dot(nor, li), 0.3, 1.0), 
+            amb = max(0.5 + 0.5 * nor.y, 0.0), 
+            spc = pow(clamp(dot(reflect(normalize(p - ro), nor), li), 
+                0.0, 1.0), 30.0);
         col *= dif * amb ;
         col += spc;
-        col = clamp(col,0.0,1.0);
+        col = clamp(col, 0.0, 1.0);
         col = pow(col, vec3(0.7));        
     }
-    fragColor = vec4(col, 1.0);;
+    
+    fragColor = vec4(col, 1.0);
 }
