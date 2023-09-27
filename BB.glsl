@@ -62,7 +62,6 @@ vec3 pos[22] = vec3[](tailCenter, tailUpperBody, tailNeck, tailHead,
                       tailLeftHip, tailLeftUpperLeg, tailLeftLowerLeg,
                       tailLeftFoot, tailNone);
 
-
 mat4 moveTo(vec3 p) {
   mat4 m = mat4(1);
   
