@@ -38,44 +38,30 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
       		
             break;
  		
+        case idxLeftUpperArm:
         case idxRightUpperArm:
-            Q = Q1;
+       		//Q = quat(vec3(0,0,1), radians(-90.0));            
+       		Q = Q1;
+        	
+            break;
+        
+        case idxLeftLowerArm:
+    		Q = quat(y, -a1);
       		
             break;
-      	
+            
         case idxRightLowerArm:
     		Q = quat(y, a1);
       		
             break;
       	
-        case idxLeftUpperArm:
-       		//Q = quat(vec3(0,0,1), radians(-90.0));            
-       		Q = Q1;
-        	
-            break;
-      	
-        case idxLeftLowerArm:
-    		Q = quat(y, -a1);
-      		
-            break;
-      	
-        case idxRightUpperLeg:
-        	Q = quat(vec3(1, 0, -0.3), a);
-        	
-            break;
-      	
-        case idxRightLowerLeg:
-       		Q = quat(x, -a);
-        	
-            break;
-      	
-        case idxRightFoot:
-       		Q = Q2;
-        	
-            break;
-      	
         case idxLeftUpperLeg:
         	Q = quat(vec3(1, 0, 0.3), a1);
+        	
+            break;
+            
+        case idxRightUpperLeg:
+        	Q = quat(vec3(1, 0, -0.3), a);
         	
             break;
       	
@@ -83,12 +69,18 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
        		Q = quat(x, -a1);
         	
             break;
-      	
-        case idxLeftFoot:
-       		Q = Q2;
+            
+        case idxRightLowerLeg:
+       		Q = quat(x, -a);
         	
             break;
       	
+        case idxLeftFoot:
+        case idxRightFoot:
+       		Q = Q2;
+        	
+            break;
+        
         case idxModelPos:
           	Q.xyz = modelPos;
        		
