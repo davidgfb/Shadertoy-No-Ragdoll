@@ -48,141 +48,141 @@ vec3 pos[22] = vec3[](tailCenter, tailUpperBody, tailNeck, tailHead,
 #define ROW int(iChannelResolution[0].y)
 
 mat4x3 bornMat(int idx) {
-    idx *=3;
+    idx *= 3;
     mat3x4 m = mat3x4(0);
-    for(int i=0;i<3;i++)
-    {
-        m[i] = texelFetch(iChannel0,ivec2(idx % ROW,idx / ROW), 0);
-        idx++;
-    }
+    
+    for(int i = 0; i < 3; i++, idx++) m[i] = texelFetch(iChannel0, 
+        ivec2(idx % ROW, idx / ROW), 0); //vec2 con signo +/-
+        
     return transpose(m);
 }
 
 vec3 modelPos() {
-    int idx = idxModelPos*3;
-    return texelFetch(iChannel0,ivec2(idx % ROW,idx / ROW), 0).xyz;
+    int idx = idxModelPos * 3;
+    
+    return texelFetch(iChannel0, ivec2(idx % ROW, idx / ROW), 0).xyz;
 }
 
-vec3 transform(vec3 p, int idx)
-{
-    return (bornMat(idx) * vec4(p,1)).xyz;
+vec3 transform(vec3 p, int idx) {
+    return (bornMat(idx) * vec4(p, 1)).xyz;
 }
 
 mat3 lookat(vec3 rd) {
-	vec3 w = normalize(rd),
-	     u = normalize(vec3(-w.z,0,w.x));
-    return mat3(u, cross(u,w), w);
+	vec3 w = normalize(rd), u = normalize(vec3(-w.z, 0, w.x));
+    
+    return mat3(u, cross(u, w), w);
 }
 
-mat2 rotate(float a)
-{
-	return mat2(cos(a), sin(a), -sin(a), cos(a));	
+mat2 rotate(float a) {
+    float s = sin(a), c = cos(a);
+    
+	return mat2(c, s, -s, c);	
 }
 
-float smin(float a,float b,float k){
-    float h=clamp(0.5+0.5*(b-a)/k,0.0,1.0);
-    return b+h*(a-b-k+k*h);
+float smin(float a, float b, float k) {
+    float h = clamp(((b - a) / k + 1.0) / 2.0, 0.0, 1.0);
+    
+    return h * (k * h + a - b - k) + b;
 }
 
-float smax(float a, float b, float k)
-{
+float smax(float a, float b, float k) {
     return smin(a, b, -k);
 }
 
-vec2 deCapsule( vec3 p, vec3 a, vec3 b)
-{
+vec2 deCapsule( vec3 p, vec3 a, vec3 b) {
     vec3 pa = p - a, ba = b - a;
-    float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
-    return vec2(length( pa - ba*h ), h);
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    
+    return vec2(length(pa - ba * h), h);
 }
 
-float deRoundBox( vec3 p, vec3 b, float r )
-{
-  return length(max(abs(p)-b,0.0))-r;
+float deRoundBox(vec3 p, vec3 b, float r) {
+  return length(max(abs(p) - b, 0.0)) - r;
 }
 
-float deUpperBody(vec3 p)
-{
+float deUpperBody(vec3 p) {
     int idx = idxUpperBody;
     p = transform(p, idx);
     vec3 q = p;
-    p-=pos[idx]*0.6;
-    float de=1.0;
-	q.x=abs(q.x)-.1;
-    vec2 c = vec2(p.y, smax(length(p.xz*vec2(1,1.3)),-(length(q.xz*vec2(1.5,1)-vec2(0,-0.5))-0.5 ) ,0.25  ) ); 
-   	c.x = (c.x>0.)?pow(c.x,1.5):c.x/1.8;
-    de = min(de, length(c)-0.6);   
-    p.x = p.x-2.0*smin(0.0,p.x,0.1)-0.28;  
+    p -= pos[idx] * 0.6;
+    float de = 1.0;
+	q.x = abs(q.x) - 0.1;
+    vec2 c = vec2(p.y, smax(length(p.xz * vec2(1, 1.3)), 
+        -(length(q.xz * vec2(1.5, 1) - vec2(0, -0.5)) - 0.5), 0.25)); 
+   	c.x = (c.x > 0.0) ? pow(c.x, 1.5) : c.x / 1.8;
+    de = min(de, length(c) - 0.6);   
+    p.x = p.x - 2.0 * smin(0.0, p.x, 0.1) - 0.28;  
     p.z -= 0.4;
-    de = smin(de, length(p)-0.2,0.3);
+    de = smin(de, length(p) - 0.2, 0.3);
+    
     return de;
 }
 
-float deLowerBody(vec3 p)
-{
+float deLowerBody(vec3 p) {
     int idx = idxLowerBody;
     p = transform(p, idx);
-    float de=1.0;
+    float de = 1.0;
     vec2 s = deCapsule(p, vec3(0), pos[idx]);
     de = min(de, s.x - 0.3);
-    p-=pos[idx]*0.85;
-	vec2 c = vec2(-p.y, length(p.xz*vec2(1,1.8))); 
-    de = smin(de, length(c)-0.5,0.6);
+    p -= pos[idx] * 0.85;
+	vec2 c = vec2(-p.y, length(p.xz * vec2(1, 1.8))); 
+    de = smin(de, length(c) - 0.5, 0.6);
+    
     //de = smax(de,-(length(p*vec3(1,0.7,0.7)-vec3(0,0.3,0.28))-0.06),0.03);
-    p.x = p.x-2.0*smin(0.0,p.x,0.02)-0.28;  
+    p.x = p.x - 2.0 * smin(0.0, p.x, 0.02) - 0.28;  
     p.z -= -0.25;
     p.y -= -0.15;
-    de = smin(de,length(p)-0.2,0.3);
+    de = smin(de, length(p) - 0.2, 0.3);
+    
     return de;
 }
 
-float deNeck(vec3 p)
-{
+float deNeck(vec3 p) {
     int idx = idxNeck;
     p = transform(p, idx);
     vec2 de = deCapsule(p, vec3(0), pos[idx]);
+    
     return de.x - 0.15;
 }
 
-float deHead(vec3 p)
-{
+float deHead(vec3 p) {
     int idx = idxHead;
     p = transform(p, idx);
-    return deRoundBox(p-pos[idx]*0.5, vec3(0.3),0.1);
+    
+    return deRoundBox(p - pos[idx] / 2.0, vec3(0.3), 0.1);
 }
 
-float deUpperArm(vec3 p, int LR)
-{
-    int idx = (LR==R)?idxRightUpperArm:idxLeftUpperArm;
+float deUpperArm(vec3 p, int LR) {
+    int idx = (LR == R) ? idxRightUpperArm : idxLeftUpperArm;
     p = transform(p, idx);
     vec2 de = deCapsule(p, vec3(0), pos[idx]);
-    return de.x - smoothstep(1.5,0.7,de.y)*0.2;
+    
+    return de.x - smoothstep(1.5, 0.7, de.y) / 5.0;
 }
 
-float deLowerArm(vec3 p, int LR)
-{
-    int idx = (LR==R)?idxRightLowerArm:idxLeftLowerArm;
+float deLowerArm(vec3 p, int LR) {
+    int idx = (LR == R) ? idxRightLowerArm : idxLeftLowerArm;
     p = transform(p, idx);
     vec2 de = deCapsule(p, vec3(0), pos[idx]);
-    return de.x - smoothstep(1.5,0.4,de.y)*0.18;
+    
+    return de.x - smoothstep(1.5, 0.4, de.y) * 0.18;
 }
 
-float deHand(vec3 p, int LR)
-{
-    int idx = (LR==R)?idxRightHand:idxLeftHand;
+float deHand(vec3 p, int LR) {
+    int idx = (LR == R) ? idxRightHand : idxLeftHand;
     p = transform(p, idx);
-    float de=1.0;
-    p-=pos[idx]*0.5;
-    vec2 c = vec2(p.x, length(p.yz*vec2(1,1.3))); 
-   	c.x = (c.x>0.)?pow(c.x,1.1):c.x/2.0;
-    de = min(de, length(c)-0.15); 
+    float de = 1.0;
+    p -= pos[idx] / 2.0;
+    vec2 c = vec2(p.x, length(p.yz * vec2(1, 1.3))); 
+   	c.x = (c.x > 0.0) ? pow(c.x, 1.1) : c.x / 2.0;
+    de = min(de, length(c) - 0.15); 
     //vec2 s = deCapsule(p, vec3(0,0.1,0), vec3(pos[idx].x*0.25,0.15,0.1));
     //de = smin(de, s.x - 0.03,0.05);
+    
     return de;
 }
 
-float deUpperLeg(vec3 p, int LR)
-{
+float deUpperLeg(vec3 p, int LR) {
     int idx = (LR==R)?idxRightUpperLeg:idxLeftUpperLeg;
     p = transform(p, idx);
     vec2 de = deCapsule(p, vec3(0), pos[idx]);
