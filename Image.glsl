@@ -35,49 +35,32 @@ const vec3 x = vec3(1, 0, 0), y = vec3(0, 1, 0), z = vec3(0, 0, 1),
 
            tailNone = vec3(0);
 
-vec3 pos[22] = vec3[](
- tailCenter        ,
- tailUpperBody     ,
- tailNeck          ,
- tailHead          ,
- tailRightShoulder ,
- tailRightUpperArm ,
- tailRigthLowerArm ,
- tailRigthHand     ,
- tailLeftShoulder  ,
- tailLeftUpperArm  ,
- tailLeftLowerArm  ,
- tailLeftHand      ,
- tailLowerBody     ,
- tailRightHip      ,
- tailRightUpperLeg ,
- tailRightLowerLeg ,
- tailRightFoot     ,
- tailLeftHip       ,
- tailLeftUpperLeg  ,
- tailLeftLowerLeg  ,
- tailLeftFoot      ,
- tailNone          
-);
-
+vec3 pos[22] = vec3[](tailCenter, tailUpperBody, tailNeck, tailHead, 
+                      tailRightShoulder, tailRightUpperArm,
+                      tailRigthLowerArm, tailRigthHand,
+                      tailLeftShoulder, tailLeftUpperArm,
+                      tailLeftLowerArm, tailLeftHand,
+                      tailLowerBody, tailRightHip, tailRightUpperLeg,
+                      tailRightLowerLeg, tailRightFoot,
+                      tailLeftHip, tailLeftUpperLeg, tailLeftLowerLeg,
+                      tailLeftFoot, tailNone);
 
 #define ROW int(iChannelResolution[0].y)
-mat4x3 bornMat(int idx)
-{
+
+mat4x3 bornMat(int idx) {
     idx *=3;
     mat3x4 m = mat3x4(0);
     for(int i=0;i<3;i++)
     {
-        m[i] = texelFetch(iChannel0,ivec2(idx%ROW,idx/ROW),0);
+        m[i] = texelFetch(iChannel0,ivec2(idx % ROW,idx / ROW), 0);
         idx++;
     }
     return transpose(m);
 }
 
-vec3 modelPos()
-{
+vec3 modelPos() {
     int idx = idxModelPos*3;
-    return texelFetch(iChannel0,ivec2(idx%ROW,idx/ROW),0).xyz;
+    return texelFetch(iChannel0,ivec2(idx % ROW,idx / ROW), 0).xyz;
 }
 
 vec3 transform(vec3 p, int idx)
