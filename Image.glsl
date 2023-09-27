@@ -145,11 +145,18 @@ float deNeck(vec3 p) {
     return de.x - 0.15;
 }
 
-float deHead(vec3 p) {
+float deHead(vec3 p) { 
+    int idx = idxHead;
+    p = transform(p, idx);
+    vec2 de = deCapsule(p, vec3(0), pos[idx]);
+    
+    return de.x - 0.3;
+    /*
     int idx = idxHead;
     p = transform(p, idx);
     
     return deRoundBox(p - pos[idx] / 2.0, vec3(0.3), 0.1);
+    */
 }
 
 float deUpperArm(vec3 p, int LR) {
@@ -211,7 +218,7 @@ float deFoot(vec3 p, int LR) {
 float map(vec3 p) {
     float len = length(p - modelPos()), r = 5.0, de = len - r + 1e-3;
         
-    if (len<=r) { 
+    if (len <= r) { 
         de = min(1.0, deUpperBody(p));
         de = smin(de, deNeck(p), 0.1);
         de = smin(de, deHead(p), 0.1);
@@ -234,7 +241,7 @@ float map(vec3 p) {
 }
 
 vec3 calcNormal(vec3 pos){
-  vec2 e = vec2(1, -1) / 2e3;
+  vec2 e = vec2(1, -1) / 500.0; 
   
   return normalize(e.xyy * map(pos + e.xyy) + e.yyx * map(pos + e.yyx) + 
                    e.yxy * map(pos + e.yxy) + e.xxx * map(pos + e.xxx));
@@ -259,7 +266,7 @@ void PH(float tmpTime, float phaseTime, int phaseNumber, int n, int v) {
 }
 
 void mainImage(out vec4 fragColor, vec2 fragCoord) {
-    vec2 p = (fragCoord.xy * 2.0 - iResolution.xy) / iResolution.y;
+    vec2 p = (2.0 * fragCoord.xy - iResolution.xy) / iResolution.y;
     vec3 ro = vec3(0, 5, 8), rd = normalize(vec3(p, 2)), 
          ta = vec3(0, 5, 0);
     
