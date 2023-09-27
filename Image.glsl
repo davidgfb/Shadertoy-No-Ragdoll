@@ -148,15 +148,9 @@ float deNeck(vec3 p) {
 float deHead(vec3 p) { 
     int idx = idxHead;
     p = transform(p, idx);
-    vec2 de = deCapsule(p, vec3(0), pos[idx]);
+    vec2 de = deCapsule(p, vec3(0, 0.2, 0), pos[idx]);
     
-    return de.x - 0.3;
-    /*
-    int idx = idxHead;
-    p = transform(p, idx);
-    
-    return deRoundBox(p - pos[idx] / 2.0, vec3(0.3), 0.1);
-    */
+    return de.x - 0.35;
 }
 
 float deUpperArm(vec3 p, int LR) {
