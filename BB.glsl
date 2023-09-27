@@ -25,36 +25,32 @@ int parentIdx[22] = int[](idxNone, idxCenter, idxUpperBody,
   idxRightFoot, idxLeftHip, idxLeftUpperLeg
   idxLeftLowerLeg, idxLeftFoot, idxNone*/
 
-#define tailCenter        vec3(0,0,0)
+const vec3 x = vec3(1, 0, 0), y = vec3(0, 1, 0), z = vec3(0, 0, 1), 
+           tailCenter = vec3(0), tailUpperBody = 1.3 * y,
+           tailNeck = 0.4 * y, tailHead = 0.6 * y,
+           tailRightShoulder = vec3(0.7, -0.2, -0.1),
+           tailRightUpperArm = 1.2 * x,
+           tailRigthLowerArm = 1.2 * x,
+           tailRigthHand = x / 5.0,
+           
+           a = vec3(-1, 1, 1),
+           tailLeftShoulder = tailRightShoulder * a,
+           tailLeftUpperArm = tailRightUpperArm * a,
+           tailLeftLowerArm = tailRigthLowerArm * a,
+           tailLeftHand = tailRigthHand * a,
 
-#define tailUpperBody     vec3(0,1.3,0)
-#define tailNeck          vec3(0,0.4,0)
-#define tailHead          vec3(0,0.6,0)
+           tailLowerBody = -1.3 * y,
+           tailRightHip = 0.3 * x,
+           tailRightUpperLeg = vec3(0, -1.8, -0.1),
+           tailRightLowerLeg = -1.5 * y, 
+           tailRightFoot = z / 2.0,
 
-#define tailRightShoulder vec3(0.7,-0.2,-0.1)
-#define tailRightUpperArm vec3(1.2,0,0)
-#define tailRigthLowerArm vec3(1.2,0,0)
-#define tailRigthHand     vec3(0.2,0,0)
+           tailLeftHip = tailRightHip * a,
+           tailLeftUpperLeg = tailRightUpperLeg * a,
+           tailLeftLowerLeg = tailRightLowerLeg * a,
+           tailLeftFoot = tailRightFoot * a,
 
-#define tailLeftShoulder  tailRightShoulder*vec3(-1,1,1)
-#define tailLeftUpperArm  tailRightUpperArm*vec3(-1,1,1)
-#define tailLeftLowerArm  tailRigthLowerArm*vec3(-1,1,1)
-#define tailLeftHand      tailRigthHand*vec3(-1,1,1)
-
-#define tailLowerBody     vec3(0,-1.3,0)
-
-#define tailRightHip      vec3(0.3,0,0)
-#define tailRightUpperLeg vec3(0,-1.8,-0.1)
-#define tailRightLowerLeg vec3(0,-1.5,0)
-#define tailRightFoot     vec3(0,0,0.5)
-
-#define tailLeftHip       tailRightHip*vec3(-1,1,1)
-#define tailLeftUpperLeg  tailRightUpperLeg*vec3(-1,1,1)
-#define tailLeftLowerLeg  tailRightLowerLeg*vec3(-1,1,1)
-#define tailLeftFoot      tailRightFoot*vec3(-1,1,1)
-
-#define tailNone          vec3(0,0,0)
-
+           tailNone = vec3(0);
 
 vec3 pos[22] = vec3[](tailCenter, tailUpperBody, tailNeck, tailHead, 
                       tailRightShoulder, tailRightUpperArm,
